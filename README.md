@@ -14,3 +14,9 @@ sqlite> select * from users;
 sqlite>
 
 
+
+pip install python-multipart
+uvicorn main:app --reload   
+
+
+
