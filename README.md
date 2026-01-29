@@ -18,5 +18,11 @@ sqlite>
 pip install python-multipart
 uvicorn main:app --reload   
 
+https://www.jwt.io/
+
+pip install "python-jose[cryptography]"
+
+openssl rand -hex 32
+8fa3a41c4a1df1a0980de3dcabc9cb78e39b4f91263ed4d47a0984b713866193
 
 
