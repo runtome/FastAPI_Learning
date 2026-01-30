@@ -11,14 +11,17 @@ from datetime import timedelta, datetime, timezone
 from jose import JWTError, jwt,JWSError
 
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/auth",
+    tags=["auth"],
+)
 
 SECRET_KEY = "8fa3a41c4a1df1a0980de3dcabc9cb78e39b4f91263ed4d47a0984b713866193"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
 class CreateUserRequest(BaseModel):
     username: str
@@ -49,10 +52,11 @@ def authenticate_user(db: Session, username: str, password: str):
         return False
     return user
 
-def create_access_token(username: str, user_id: int, expire_delta: timedelta):
+def create_access_token(username: str, user_id: int,role: str, expire_delta: timedelta):
     encode = {
         "sub": username,
-        "id": user_id
+        "id": user_id,
+        "role": role
     }
     expires=datetime.now(timezone.utc) + expire_delta
     encode.update({"exp": expires})
@@ -63,9 +67,10 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         user_id: int = payload.get("id")
+        user_role: str = payload.get("role")
         if username is None or user_id is None:
             return HttpException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
-        return {"username": username, "id": user_id}
+        return {"username": username, "id": user_id, "user_role": user_role}
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -75,7 +80,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
 
                            
 
-@router.post("/auth/", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_user( db: db_dependency, 
                       create_user_request: CreateUserRequest):
     create_user_model = Users(
@@ -108,6 +113,7 @@ async def login_for_access_token(
     token = create_access_token(
         username=user.username,
         user_id=user.id,
+        role=user.role,
         expire_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
 
