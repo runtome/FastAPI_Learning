@@ -29,5 +29,7 @@ openssl rand -hex 32
 pip install psycopg2-binary 
 pip install python-dotenv
 
+pip install alembic
 
+alembic init alembic
 
