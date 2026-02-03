@@ -39,3 +39,5 @@ def test_student_instance():
     assert student.last_name == "Doe" , "Last name does not match"
     assert student.major == "Computer Science" , "Major does not match"
     assert student.years == 3
+    
+    
