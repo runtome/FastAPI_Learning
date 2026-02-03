@@ -39,3 +39,6 @@ alembic upgrade b9fa4699b4d8
 
 alembic downgrade -1
 
+
+alembic upgrade b9fa4699b4d8
+
