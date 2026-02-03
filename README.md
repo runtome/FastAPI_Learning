@@ -42,3 +42,6 @@ alembic downgrade -1
 
 alembic upgrade b9fa4699b4d8
 
+ pip install pytest
+
+ when run pytest
