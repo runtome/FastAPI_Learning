@@ -37,3 +37,5 @@ alembic revision -m "Create phone for user column"
 
 alembic upgrade b9fa4699b4d8
 
+alembic downgrade -1
+
