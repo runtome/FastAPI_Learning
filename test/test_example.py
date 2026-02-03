@@ -32,12 +32,16 @@ class Student:
       self.major = major
       self.years = years
       
-def test_student_instance():
-    student = Student("John", "Doe", "Computer Science", 3)
-    assert isinstance(student, Student)
-    assert student.name == "John" , "First name does not match"
-    assert student.last_name == "Doe" , "Last name does not match"
-    assert student.major == "Computer Science" , "Major does not match"
-    assert student.years == 3
+@pytest.fixture
+def defult_student():
+    return Student("Alice", "Smith", "Mathematics", 2)
+      
+def test_student_instance(defult_student):
+
+    assert isinstance(defult_student, Student)
+    assert defult_student.name == "Alice" , "First name does not match"
+    assert defult_student.last_name == "Smith" , "Last name does not match"
+    assert defult_student.major == "Mathematics" , "Major does not match"
+    assert defult_student.years == 2
     
     
