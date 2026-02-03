@@ -2,6 +2,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.pool import StaticPool
 from fastapi.testclient import TestClient
 from fastapi import status
+import pytest
+from app.models import Todos
 
 from app.routers.auth import get_current_user
 from app.routers.todos import get_db
@@ -36,7 +38,53 @@ app.dependency_overrides[get_current_user] = override_get_current_user
 
 client = TestClient(app)
 
+from app.models import Todos, Users
+
+@pytest.fixture(autouse=True)
+def test_todo():
+    db = TestingSessionLocal()
+
+    # 1. สร้าง user ก่อน
+    user = Users(
+        id=1,
+        username="test",
+        email="test@test.com",
+        hashed_password="fakehashedpassword",
+        is_active=True,
+        role="admin"
+    )
+    db.add(user)
+    db.commit()
+
+    # 2. สร้าง todo ที่อ้างถึง user
+    todo = Todos(
+        title="Test Todo",
+        description="This is a test todo",
+        priority=1,
+        complete=False,
+        owner_id=1
+    )
+    db.add(todo)
+    db.commit()
+
+    yield todo
+
+    # cleanup
+    db.query(Todos).delete()
+    db.query(Users).delete()
+    db.commit()
+    db.close()
+
 def test_read_all_authenticated():
     response = client.get("/")
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == []
+
+    data = response.json()
+    assert len(data) == 1
+
+    todo = data[0]
+    assert todo["title"] == "Test Todo"
+    assert todo["description"] == "This is a test todo"
+    assert todo["priority"] == 1
+    assert todo["complete"] is False
+    assert todo["owner_id"] == 1
