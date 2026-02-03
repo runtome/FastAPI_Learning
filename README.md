@@ -33,3 +33,7 @@ pip install alembic
 
 alembic init alembic
 
+alembic revision -m "Create phone for user column"
+
+alembic upgrade b9fa4699b4d8
+

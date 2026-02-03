@@ -44,14 +44,7 @@ async def get_user_details(
   user = db.query(Users).filter(Users.id == user["id"]).first()
   if not user:
       raise HttpException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-  return {
-      "id": user.id,
-      "username": user.username,
-      "email": user.email,
-      "first_name": user.first_name,
-      "last_name": user.last_name,
-      "role": user.role
-  }
+  return user
   
 @router.put("/password", status_code=status.HTTP_200_OK)
 async def update_user_password(
