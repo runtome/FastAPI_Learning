@@ -1,6 +1,7 @@
 from utils import *
 from app.routers.admin import get_db, get_current_user
 from fastapi import status
+from app.models import Todos
 
 app.dependency_overrides[get_db] = override_get_db
 app.dependency_overrides[get_current_user] = override_get_current_user
@@ -26,3 +27,34 @@ def test_read_all_admin_unauthenticated():
     response = client.get("/admin/todos")
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
     app.dependency_overrides[get_current_user] = override_get_current_user
+    
+
+def test_admin_delete_todo():
+    # First, create a todo to delete
+    db = TestingSessionLocal()
+    todo = Todos(
+        title="Todo to Delete",
+        description="This todo will be deleted by admin",
+        priority=2,
+        complete=False,
+        owner_id=1
+    )
+    db.add(todo)
+    db.commit()
+    db.refresh(todo)
+    todo_id = todo.id
+    db.close()
+
+    # Now, delete the todo as admin
+    response = client.delete(f"/admin/todo/{todo_id}")
+    assert response.status_code == status.HTTP_200_OK
+
+    # Verify the todo is deleted
+    db = TestingSessionLocal()
+    deleted_todo = db.query(Todos).filter(Todos.id == todo_id).first()
+    assert deleted_todo is None
+    db.close()
+    
+def test_admin_delete_todo_not_found():
+    response = client.delete("/admin/todo/9999")  # Assuming 9999 does not exist
+    assert response.status_code == status.HTTP_404_NOT_FOUND
