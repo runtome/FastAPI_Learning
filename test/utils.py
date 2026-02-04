@@ -67,7 +67,7 @@ def test_todo():
     db.add(todo)
     db.commit()
 
-    yield todo
+    yield todo , user
 
     # cleanup
     db.query(Todos).delete()

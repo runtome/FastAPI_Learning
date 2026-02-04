@@ -49,7 +49,7 @@ def test_create_todo():
 
 
 def test_update_todo(test_todo):
-    todo_id = test_todo.id
+    todo_id = test_todo[0].id
     update_data = {
         "title": "Updated Todo",
         "description": "This todo has been updated",
@@ -80,7 +80,7 @@ def test_update_todo_not_found(test_todo):
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 def test_delete_todo(test_todo):
-    todo_id = test_todo.id
+    todo_id = test_todo[0].id
     response = client.delete(f"/todo/{todo_id}")
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
