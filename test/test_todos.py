@@ -88,3 +88,26 @@ def test_read_all_authenticated():
     assert todo["priority"] == 1
     assert todo["complete"] is False
     assert todo["owner_id"] == 1
+
+
+def test_create_todo():
+    
+    request_data = {
+        "title": "New Todo",
+        "description": "This is a new todo",
+        "priority": 2,
+        "complete": False
+    }
+    response = client.post("/todo/", json=request_data)
+    assert response.status_code == status.HTTP_201_CREATED
+    
+    db = TestingSessionLocal()
+    todo_in_db = db.query(Todos).filter(Todos.title == "New Todo").first()
+    assert todo_in_db is not None
+    assert todo_in_db.title == request_data["title"]
+    assert todo_in_db.description == request_data["description"]
+    assert todo_in_db.priority == request_data["priority"]
+    assert todo_in_db.complete == request_data["complete"]
+    db.close()
+
+ 
