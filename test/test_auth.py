@@ -2,6 +2,7 @@ from utils import *
 from app.routers.auth import create_access_token, get_current_user,get_db,authenticate_user, SECRET_KEY,ALGORITHM
 from jose import jwt
 from datetime import datetime, timedelta
+from fastapi import HTTPException, status
 
 app.dependency_overrides[get_db] = override_get_db
 
@@ -55,3 +56,13 @@ async def test_get_current_user(test_todo):
     assert current_user["username"] == username
     assert current_user["id"] == user_id
     assert current_user["user_role"] == role
+    
+@pytest.mark.asyncio
+async def test_get_current_user_invalid_token():
+    invalid_token = "invalid.token.string"
+    token = jwt.encode({"sub": "test", "id": 1, "role": "admin"}, "wrong_secret", algorithm="HS256")
+    
+    with pytest.raises(HTTPException) as exc_info:
+        await get_current_user(invalid_token)
+    assert exc_info.value.status_code == status.HTTP_401_UNAUTHORIZED
+    assert exc_info.value.detail == "Could not validate credentials"  
