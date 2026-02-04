@@ -47,3 +47,5 @@ alembic upgrade b9fa4699b4d8
  when run pytest
 
 pytest --disable-warnings
+
+pip install pytest-asyncio
