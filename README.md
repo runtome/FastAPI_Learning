@@ -49,3 +49,6 @@ alembic upgrade b9fa4699b4d8
 pytest --disable-warnings
 
 pip install pytest-asyncio
+
+pip install aiofiles
+pip install Jinja2
