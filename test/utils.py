@@ -10,6 +10,7 @@ from sqlalchemy.orm import sessionmaker
 from app.database import Base
 from app.main import app
 from app.models import Users, Todos
+from app.routers.auth import bcrypt_context
 
 
 
@@ -47,9 +48,10 @@ def test_todo():
         id=1,
         username="test",
         email="test@test.com",
-        hashed_password="fakehashedpassword",
+        hashed_password=bcrypt_context.hash("testpassword"),
         is_active=True,
-        role="admin"
+        role="admin",
+        phone='111111111'
     )
     db.add(user)
     db.commit()
