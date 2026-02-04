@@ -3,6 +3,7 @@ from app.database import engine
 from app import models
 from app.routers import auth, todos, admin, users
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 
 
 app = FastAPI()
@@ -10,6 +11,8 @@ app = FastAPI()
 models.Base.metadata.create_all(bind=engine)
 
 templates = Jinja2Templates(directory="app/templates")
+
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 @app.get("/")
 def read_root(request: Request):
