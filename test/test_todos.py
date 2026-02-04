@@ -13,7 +13,7 @@ app.dependency_overrides[get_db] = override_get_db
 app.dependency_overrides[get_current_user] = override_get_current_user
 
 def test_read_all_authenticated():
-    response = client.get("/")
+    response = client.get("/todos")
     assert response.status_code == status.HTTP_200_OK
 
     data = response.json()
@@ -35,7 +35,7 @@ def test_create_todo():
         "priority": 2,
         "complete": False
     }
-    response = client.post("/todo/", json=request_data)
+    response = client.post("/todos/todo/", json=request_data)
     assert response.status_code == status.HTTP_201_CREATED
     
     db = TestingSessionLocal()
@@ -56,7 +56,7 @@ def test_update_todo(test_todo):
         "priority": 3,
         "complete": True
     }
-    response = client.put(f"/todo/{todo_id}/", json=update_data)
+    response = client.put(f"/todos/todo/{todo_id}/", json=update_data)
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
     db = TestingSessionLocal()
@@ -76,12 +76,12 @@ def test_update_todo_not_found(test_todo):
         "priority": 3,
         "complete": True
     }
-    response = client.put(f"/todo/{todo_id}/", json=update_data)
+    response = client.put(f"/todos/todo/{todo_id}/", json=update_data)
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 def test_delete_todo(test_todo):
     todo_id = test_todo[0].id
-    response = client.delete(f"/todo/{todo_id}")
+    response = client.delete(f"/todos/todo/{todo_id}")
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
     db = TestingSessionLocal()
@@ -91,6 +91,6 @@ def test_delete_todo(test_todo):
     
 def test_delete_todo_not_found():
     todo_id = 999  # Non-existent todo ID
-    response = client.delete(f"/todo/{todo_id}")
+    response = client.delete(f"/todos/todo/{todo_id}")
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.json()["detail"] == "Todo not found"
